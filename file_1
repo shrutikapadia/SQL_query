@@ -1,0 +1,319 @@
+SQL> create table client1(
+  2   clientno varchar2(6) primary key check(clientno like 'C%'),
+  3   name varchar2(20) not null,
+  4   city varchar2(15),
+  5   pincode number(8),
+  6   state varchar2(15),
+  7   baldue number(10,5)
+  8  );
+
+Table created.
+
+SQL> create table product1(
+  2   productno varchar2(6) primary key check(productno like 'P%'),
+  3   description varchar2(15) not null,
+  4   profitpercent number(4,2) not null,
+  5   unitmeasure varchar2(10) not null,
+  6   qtyonhand number(8) not null,
+  7   reorderlvl number(8) not null,
+  8   costprice number(8,2) not null check(costprice<>0),
+  9   sellprice number(8,2) not null check(sellprice<>0)
+ 10  );
+
+Table created.
+
+SQL> create table salesman1(
+  2   salesmanno varchar2(6) primary key check(salesmanno like 'S%'),
+  3   salesmanname varchar2(20) not null,
+  4   address1 varchar2(30) not null,
+  5   address2 varchar2(30),
+  6   city varchar2(20),
+  7   pincode number(8),
+  8   state varchar2(20),
+  9   salamt number(8,2) not null check(salamt<>0),
+ 10   tgttoget number(6,2) not null check(tgttoget<>0),
+ 11   ytdsales number(6,2) not null,
+ 12   remarks varchar2(60)
+ 13  );
+
+Table created.
+
+SQL> create table sales_order1(
+  2   orderno varchar2(6) primary key check(orderno like 'O%'),
+  3   clientno varchar2(6) references client1(clientno),
+  4   orderdate date not null,
+  5   salesmanno varchar2(6) references salesman1(salesmanno),
+  6   delaytype char(1) default 'F' check(delaytype like 'P' or delaytype like 'F'),
+  7   billyn char(1),
+  8   delaydate date,
+  9   orderstatus varchar2(10) check(orderstatus in ('In Process','Fulfilled','BackOrder','Cancelled')),
+ 10   constraint datecon check(delaydate >= orderdate)
+ 11  );
+
+Table created.
+
+SQL> create table sales_order_details1(
+  2   orderno varchar2(6) references sales_order1(orderno),
+  3   productno varchar2(6) references product1(productno),
+  4   qtyordered number(8),
+  5   productrate number(10,2)
+  6  );
+
+Table created.
+
+SQL> alter table salesman1
+  2  modify remarks into not null;
+modify remarks into not null
+               *
+ERROR at line 2:
+ORA-00902: invalid datatype 
+
+
+SQL>  alter table salesman1
+  2   modify remarks varchar2(60) not null;
+
+Table altered.
+
+SQL> insert into sales_order values('O19001','C01','12-JAN-16','S01','F','N','20-JAN-16','In Process'
+  2    2  );
+  2  )
+  *
+ERROR at line 2:
+ORA-00917: missing comma 
+
+
+SQL> insert into sales_order values('O19001','C01','12-JAN-16','S01','F','N','20-JAN-16','In Process'
+  2  );
+
+1 row created.
+
+SQL>  insert into sales_order values('O19002','C02','25-JAN-17','S02','P','N','27-JAN-17','Cancelled');
+
+1 row created.
+
+SQL> insert into sales_order values('O46865','C03','18-FEB-17','S03','F','Y','20-FEB-17','Fulfilled');
+
+1 row created.
+
+SQL> insert into sales_order values('O19003','C01','03-APR-16','S01','F','Y','07-APR-16','Fulfilled');
+
+1 row created.
+
+SQL> insert into sales_order values('O46866','C04','20-MAY-16','S02','P','N','22-MAY-16','Cancelled');
+
+1 row created.
+
+SQL> insert into sales_order values('O19008','C05','24-MAY-16','S04','F','N','26-MAY-16','In Process');
+
+1 row created.
+
+SQL> insert into client values('c01','ivan bayross','mumbai',400054,'maharashtra',15000);
+insert into client values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+            *
+ERROR at line 1:
+ORA-00947: not enough values 
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+SQL> /
+insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BCE18226.SYS_C00131014) violated 
+
+
+SQL> \
+SP2-0042: unknown command "\" - rest of line ignored.
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+SQL> /
+insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BCE18226.SYS_C00131014) violated 
+
+
+SQL>  insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000);
+ insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BCE18226.SYS_C00131014) violated 
+
+
+SQL> insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000);
+insert into client1 values('c01','ivan bayross','mumbai',400054,'maharashtra',15000)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BCE18226.SYS_C00131014) violated 
+
+
+SQL> insert into client values('c03','chhaya patel','mumbai',400057,'maharashtra',5000);
+insert into client values('c03','chhaya patel','mumbai',400057,'maharashtra',5000)
+            *
+ERROR at line 1:
+ORA-00947: not enough values 
+
+
+SQL> ed
+Wrote file afiedt.buf
+
+  1* insert into client1 values('c03','chhaya patel','mumbai',400057,'maharashtra',5000)
+SQL> insert into client1 values('c03','chhaya patel','mumbai',400057,'maharashtra',5000);
+insert into client1 values('c03','chhaya patel','mumbai',400057,'maharashtra',5000)
+*
+ERROR at line 1:
+ORA-02290: check constraint (BCE18226.SYS_C00131014) violated 
+
+
+SQL> select salesmanno,count(*)
+  2  from sales_order
+  3  group by salesamanno;
+group by salesamanno
+         *
+ERROR at line 3:
+ORA-00904: "SALESAMANNO": invalid identifier 
+
+
+SQL>  select salesmanno,count(*)
+  2  from sales_order
+  3  group by salesmanno;
+
+SALESM  COUNT(*)                                                                                    
+------ ---------                                                                                    
+S01            4                                                                                    
+S02            4                                                                                    
+S03            2                                                                                    
+S04            2                                                                                    
+
+SQL> select name,count(*)
+  2  from client
+  3  group by baldue;
+select name,count(*)
+       *
+ERROR at line 1:
+ORA-00979: not a GROUP BY expression 
+
+
+SQL>  select baldue,count(*)
+  2   from client
+  3   group by baldue;;
+ group by baldue;
+                *
+ERROR at line 3:
+ORA-00911: invalid character 
+
+
+SQL>  select baldue,count(*)
+  2    from client
+  3   group by baldue;
+
+   BALDUE  COUNT(*)                                                                                 
+--------- ---------                                                                                 
+     5000         1                                                                                 
+    15000         1                                                                                 
+     2000         1                                                                                 
+        0         2                                                                                 
+
+SQL>  select baldue,count(*)
+  2    from client
+  3  ;
+ select baldue,count(*)
+        *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> select count(*)
+  2  from client
+  3  where baldue=0;
+
+ COUNT(*)                                                                                           
+---------                                                                                           
+        2                                                                                           
+
+SQL> select description,max(sellprice)
+  2  from product;
+select description,max(sellprice)
+       *
+ERROR at line 1:
+ORA-00937: not a single-group group function 
+
+
+SQL> select max(sellprice)
+  2  from product;
+
+MAX(SELLPRICE)                                                                                      
+--------------                                                                                      
+         12000                                                                                      
+
+SQL> select max(sellprice/costprice)
+  2  from product;
+
+MAX(SELLPRICE/COSTPRICE)                                                                            
+------------------------                                                                            
+                     2.1                                                                            
+
+SQL> select description from product where (sellprice = select max(selprice_
+  2  ;
+select description from product where (sellprice = select max(selprice_
+                                                 *
+ERROR at line 1:
+ORA-00936: missing expression 
+
+
+SQL> select description from product where sellprice=(select max(sellprice) from product);
+
+DESCRIPTION                                                                                         
+---------------                                                                                     
+Monitors                                                                                            
+
+SQL> select description,sellprice from product where sellprice=(select max(sellprice) from product);
+
+DESCRIPTION     SELLPRICE                                                                           
+--------------- ---------                                                                           
+Monitors            12000                                                                           
+
+SQL> select description from product where (sellprice-costprice)/costprice)=(select max( (sellprice-costprice)/costprice) from product;
+select description from product where (sellprice-costprice)/costprice)=(select max( (sellprice-costprice)/costprice) from product
+                                                                     *
+ERROR at line 1:
+ORA-00920: invalid relational operator 
+
+
+SQL>  select description from product where (sellprice-costprice)/costprice=(select max( (sellprice-costprice)/costprice) from product;
+ select description from product where (sellprice-costprice)/costprice=(select max( (sellprice-costprice)/costprice) from product
+                                                                        *
+ERROR at line 1:
+ORA-00920: invalid relational operator 
+
+
+SQL> select description from product where (sellprice-costprice)/costprice=(select max( (sellprice-costprice)/costprice) from product);
+
+DESCRIPTION                                                                                         
+---------------                                                                                     
+Mouse                                                                                               
+
+SQL> select productno from product where (profitpercent/qtyonhand)=(select max(profitpercent/qtyonhand) from product);
+
+PRODUC                                                                                              
+------                                                                                              
+P03453                                                                                              
+
+SQL> ;
+  1* select productno from product where (profitpercent/qtyonhand)=(select max(profitpercent/qtyonhand) from product)
+SQL> select productno,count(*)
+  2  from sales_order_details
+  3  group by productno;
+
+PRODUC  COUNT(*)                                                                                    
+------ ---------                                                                                    
+P07965         2                                                                                    
+P07868         1                                                                                    
+P00001         2                                                                                    
+
+SQL> 
